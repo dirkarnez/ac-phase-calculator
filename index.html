@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <script type="module">
+        import { default as fftw } from "./fftw-js.0.1.4.esm.min.js";
+        debugger;
+        fftw.FFT
+
+        // Create a sine wave signal
+        const sampleRate = 512; // Sample rate in Hz
+        const frequency = 5; // Frequency of the sine wave in Hz
+        const duration = 1; // Duration in seconds
+        const numSamples = sampleRate * duration;
+        const sineWave = new Float32Array(numSamples);
+
+        for (let i = 0; i < numSamples; i++) {
+            sineWave[i] = Math.sin(2 * Math.PI * frequency * (i / sampleRate));
+        }
+
+        // Perform FFT using fftw-js
+        const fft = new fftw.FFT(numSamples);
+        const inBuffer = fft.allocComplex();
+        const outBuffer = fft.allocComplex();
+
+        // Copy the sine wave data into the input buffer
+        for (let i = 0; i < numSamples; i++) {
+            inBuffer[i][0] = sineWave[i]; // Real part
+            inBuffer[i][1] = 0;            // Imaginary part
+        }
+
+        // Execute the FFT
+        fft.execute(inBuffer, outBuffer);
+
+        // Output the FFT results
+        const frequencies = new Float32Array(numSamples);
+        for (let i = 0; i < numSamples; i++) {
+            frequencies[i] = Math.sqrt(outBuffer[i][0] ** 2 + outBuffer[i][1] ** 2);
+        }
+
+        // Log the results
+        console.log(frequencies);
+    </script>
+</body>
+</html>
