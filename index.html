@@ -122,7 +122,6 @@
         return x;
     };
     window.fftw.then(fftwJS => {
-        const plan = fftwJS.r2c.fft1d(100);
         const size = A2_1024.length;
         var fftr = new fftwJS.r2r.fft1d(size);
         var transform = fftr.forward(A2_1024);
