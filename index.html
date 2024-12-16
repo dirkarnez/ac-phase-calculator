@@ -121,6 +121,7 @@
 
         return x;
     };
+    
     window.fftw.then(fftwJS => {
         const size = A2_1024.length;
         var fftr = new fftwJS.r2r.fft1d(size);
