@@ -110,13 +110,8 @@
                                                                 0.9522611498832703, 0.9473598599433899, 0.9422259330749512, 0.9368605017662048, 0.9312650561332703,
                                                                  0.925440788269043, 0.9193893074989319, 0.9131119251251221 ];        
     var scaleTransform = function(trans, size) {
-        var i = 0;
-        var bSi = 1.0 / size;
-        var x = trans;
-
-        while (i < x.length) {
+        for  (var x = trans, bSi = 1.0 / size, i = 0; i < x.length; i++) {
             x[i] *= bSi; 
-            i++;
         }
 
         return x;
