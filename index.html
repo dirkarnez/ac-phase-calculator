@@ -7,6 +7,26 @@
 <body>
     <script src='./fftw-js/bundle.js'></script>
     <script>
+        function getMiscRealBuffer(size) {
+            var result = new Float32Array(size);
+            for (var i = 0; i < result.length; i++) {
+                // 0 or 1 => 0 or 0.25
+                result[i] = (i % 2) / 4.0;
+            }
+            return result;
+        }
+
+        function getMiscComplexBuffer (size) {
+            var result = new Float32Array(2*size)
+            for (var i=0; i<size; i++) {
+                // result[2*i] = i
+                // result[2*i + 1] = i
+                result[2*i] = Math.random()
+                result[2*i + 1] = Math.random()
+            }
+            return result
+        }
+
         const A2_1024 = [ 
             -0.9954783916473389, 
             -0.9938675761222839, 
