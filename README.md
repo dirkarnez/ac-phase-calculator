@@ -3,6 +3,11 @@
 
 ![](./394358342-a2bef090-25ae-47ed-b524-299a000086f6.png)
 
+### TODOs
+- [ ] matlab checking
+- [ ] plotting
+      - [dirkarnez/tiny-spice-parser](https://github.com/dirkarnez/tiny-spice-parser)
+
 - https://github.com/j-funk/fftw-js/blob/master/test/fft.spec.js
 - http://www.physicsbootcamp.org/Circuit-Analysis-Using-Complex-Numbers.html
 - https://ciiec.buap.mx/FFT.js/
