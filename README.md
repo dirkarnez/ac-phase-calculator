@@ -3,6 +3,17 @@
 
 ![](./394358342-a2bef090-25ae-47ed-b524-299a000086f6.png)
 
+### SPICE
+[dirkarnez/ngspice-netlists-collection](https://github.com/dirkarnez/ngspice-netlists-collection)
+```
+"Diode circuit",
+"D1 OUT 0 1N914",
+"V1 OUT 0 0",
+".model 1N914 D(Is=2.52e-9 Rs=0.568 N=1.752 Cjo=4e-12 M=0.4 tt=20e-9)",
+".DC V1 -1 1 10e-3",
+".SAVE i(V1)",
+".END");
+```
 ### TODOs
 - [ ] matlab checking
 - [ ] plotting
