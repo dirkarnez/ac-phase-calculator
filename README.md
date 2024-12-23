@@ -18,3 +18,4 @@
 - [Understanding the Discrete Fourier Transform and the FFT - YouTube](https://www.youtube.com/watch?v=QmgJmh2I3Fw)
 - models
       - https://www.ni.com/en/shop/electronic-test-instrumentation/application-software-for-electronic-test-and-instrumentation-category/what-is-multisim/spice-simulation-fundamentals/spice-simulation-models.html
+- EE4007
