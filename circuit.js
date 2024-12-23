@@ -1,4 +1,5 @@
-            // Build the circuit
+https://github.com/SpiceSharp/SpiceSharp
+// Build the circuit
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", 0.0),
                 new Resistor("R1", "in", "out", 1.0e3),
