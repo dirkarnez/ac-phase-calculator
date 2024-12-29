@@ -30,3 +30,5 @@
 - models
       - https://www.ni.com/en/shop/electronic-test-instrumentation/application-software-for-electronic-test-and-instrumentation-category/what-is-multisim/spice-simulation-fundamentals/spice-simulation-models.html
 - EE4007
+- Diodes
+      - [最简单的半导体-二极管！通俗讲解二极管的8个作用！ - YouTube](https://www.youtube.com/watch?v=lsSHvi6ncyI)
