@@ -14,8 +14,10 @@
 ".SAVE i(V1)",
 ".END");
 ```
+
 ### TODOs
 - [ ] matlab checking
+- [ ] Quadratic Equation complex root on RLC circuit
 - [ ] plotting
       - [dirkarnez/tiny-spice-parser](https://github.com/dirkarnez/tiny-spice-parser)
 
