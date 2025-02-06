@@ -16,6 +16,7 @@
 ```
 
 ### TODOs
+- [ ] DFT: `new fftwJS.r2c.fft1d(4).forward([1, 2, 2, 0]); // [5, 0, -1, -2, 1, 0]`
 - [ ] matlab checking
 - [ ] Quadratic Equation complex root on RLC circuit
 - [ ] plotting
