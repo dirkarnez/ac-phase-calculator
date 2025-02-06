@@ -14,6 +14,30 @@
 ".SAVE i(V1)",
 ".END");
 ```
+### Hz to sine function
+```
+60hz = (1 / 60)s = 0.01666666666s per period
+sin (t) = (2 * pi)s per period
+sin(t) is slower
+
+(2 * pi) / (1 / 60) = 60 * 2 * pi is the mulipler
+
+60hz = sin(t * 60 * 2 * pi ) // the bigger the parameter the faster is the sin output
+generally the sin function on time axis for nHz = sin( nHz * 2 * pi * t)
+
+To be simple: sin (2 * pi * t) is 1 hz
+we take this as a unit, we can add multiplier to get any hz we want
+```
+
+
+
+
+
+
+
+
+
+
 
 ### TODOs
 - [ ] DFT: `new fftwJS.r2c.fft1d(4).forward([1, 2, 2, 0]); // [5, 0, -1, -2, 1, 0]`
