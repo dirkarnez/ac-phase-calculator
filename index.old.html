@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <script src='./fftw-js/bundle.js'></script>
+    <script>
+        function getMiscRealBuffer(size) {
+            var result = new Float32Array(size);
+            for (var i = 0; i < result.length; i++) {
+                // 0 or 1 => 0 or 0.25
+                result[i] = (i % 2) / 4.0;
+            }
+            return result;
+        }
+
+        function getMiscComplexBuffer (size) {
+            var result = new Float32Array(2*size)
+            for (var i=0; i<size; i++) {
+                // result[2*i] = i
+                // result[2*i + 1] = i
+                result[2*i] = Math.random()
+                result[2*i + 1] = Math.random()
+            }
+            return result
+        }
+    
+    var scaleTransform = function(trans, size) {
+        var i = 0,
+            bSi = 1.0 / size,
+            x = trans;
+        while(i < x.length) {
+            x[i] *= bSi; i++;
+        }
+        return x;
+    };
+
+    function reorganizeNumpyRealOutput (a) {
+        var b = new Array(a.length)
+        b.fill(0)
+        b[0] = a[0]
+        b[a.length/2] = a[a.length - 1]
+        for (var i=1; i<a.length/2; i++) {
+            b[i] = a[2*i - 1]
+            b[a.length - i] = a[2*i]
+        }
+        return b
+    }
+
+    fetch("./test/cos_y.csv")
+    .then(res => res.text())
+    .then(csvContent => {
+        // const data = new Float32Array(
+        //     csvContent
+        //     .split("\r\n")
+        //     .filter(a => a.length > 0)
+        //     .map(a => Number(a))
+        // );
+
+        const SAMPLE_FREQUENCY = 44100
+        const DURATION = 0.5
+        var number_of_samples = SAMPLE_FREQUENCY * DURATION;
+
+        time_intervals = Array(number_of_samples);
+        cos_wave = Array(number_of_samples);
+
+
+        // Generate cosine wave
+        for (var i = 0; i < number_of_samples; i++) {
+            time_intervals[i] = i / SAMPLE_FREQUENCY;
+            cos_wave[i] = 0.7 * Math.cos(2 * Math.PI * 5000 * time_intervals[i]);
+        }
+
+        debugger;
+
+        data = cos_wave;
+        
+        window.fftw.then(fftwJS => {
+            const size = data.length;
+            var fftr = new fftwJS.r2c.fft1d(size);
+            var transform = fftr.forward(data);
+            var transScaled = scaleTransform(transform, size);
+            debugger;
+            // var a2_again = fftr.inverse(transScaled);
+            // for(var i = 0; i < size; i++) {
+            //     console.log(data[i], a2_again[i]);
+            // }
+            // // Clean up after you're done - NOTE:: dispose will modify the transform array slightly,
+            // // so only dispose after any use of results are complete
+            // fftr.dispose();
+        })
+    })
+
+         
+    </script>
+     <script type="module">
+        import { default as fftw } from "./fftw-js.0.1.4.esm.min.js";
+        debugger;
+    </script>
+    <!--
+        <script type="module">
+        // Create a sine wave signal
+        const sampleRate = 512; // Sample rate in Hz
+        const frequency = 5; // Frequency of the sine wave in Hz
+        const duration = 1; // Duration in seconds
+        const numSamples = sampleRate * duration;
+        const sineWave = new Float32Array(numSamples);
+
+        for (let i = 0; i < numSamples; i++) {
+            sineWave[i] = Math.sin(2 * Math.PI * frequency * (i / sampleRate));
+        }
+
+        // Perform FFT using fftw-js
+        const fft = new fftw.FFT(numSamples);
+        const inBuffer = fft.allocComplex();
+        const outBuffer = fft.allocComplex();
+
+        // Copy the sine wave data into the input buffer
+        for (let i = 0; i < numSamples; i++) {
+            inBuffer[i][0] = sineWave[i]; // Real part
+            inBuffer[i][1] = 0;            // Imaginary part
+        }
+
+        // Execute the FFT
+        fft.execute(inBuffer, outBuffer);
+
+        // Output the FFT results
+        const frequencies = new Float32Array(numSamples);
+        for (let i = 0; i < numSamples; i++) {
+            frequencies[i] = Math.sqrt(outBuffer[i][0] ** 2 + outBuffer[i][1] ** 2);
+        }
+
+        // Log the results
+        console.log(frequencies);
+    </script> -->
+</body>
+</html>

@@ -1,139 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        label,
+        textarea {
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            padding: 10px;
+            width: 90%;
+            line-height: 1.5;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 1px 1px 1px #999;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .terminal {
+            background-color: #151515;
+            box-sizing: border-box;
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        p {
+            color: #9CD9F0;
+            text-align: left;
+            font-size: 1.25em;
+            font-family: monospace;
+            white-space: normal;
+            overflow: hidden;
+        }
+    </style>
 </head>
+
 <body>
     <script src='./fftw-js/bundle.js'></script>
     <script>
-        function getMiscRealBuffer(size) {
-            var result = new Float32Array(size);
-            for (var i = 0; i < result.length; i++) {
-                // 0 or 1 => 0 or 0.25
-                result[i] = (i % 2) / 4.0;
-            }
-            return result;
+        const fft = (fftwJS, array) => {
+            var fftr = new fftwJS.r2c.fft1d(array.length);
+            const fftOutput = fftr.forward(array);
+            fftr.dispose();
+            return fftOutput;
         }
 
-        function getMiscComplexBuffer (size) {
-            var result = new Float32Array(2*size)
-            for (var i=0; i<size; i++) {
-                // result[2*i] = i
-                // result[2*i + 1] = i
-                result[2*i] = Math.random()
-                result[2*i + 1] = Math.random()
-            }
-            return result
-        }
-    
-    var scaleTransform = function(trans, size) {
-        var i = 0,
-            bSi = 1.0 / size,
-            x = trans;
-        while(i < x.length) {
-            x[i] *= bSi; i++;
-        }
-        return x;
-    };
-
-    function reorganizeNumpyRealOutput (a) {
-        var b = new Array(a.length)
-        b.fill(0)
-        b[0] = a[0]
-        b[a.length/2] = a[a.length - 1]
-        for (var i=1; i<a.length/2; i++) {
-            b[i] = a[2*i - 1]
-            b[a.length - i] = a[2*i]
-        }
-        return b
-    }
-
-    fetch("./test/cos_y.csv")
-    .then(res => res.text())
-    .then(csvContent => {
-        // const data = new Float32Array(
-        //     csvContent
-        //     .split("\r\n")
-        //     .filter(a => a.length > 0)
-        //     .map(a => Number(a))
-        // );
-
-        const SAMPLE_FREQUENCY = 44100
-        const DURATION = 0.5
-        var number_of_samples = SAMPLE_FREQUENCY * DURATION;
-
-        time_intervals = Array(number_of_samples);
-        cos_wave = Array(number_of_samples);
-
-
-        // Generate cosine wave
-        for (var i = 0; i < number_of_samples; i++) {
-            time_intervals[i] = i / SAMPLE_FREQUENCY;
-            cos_wave[i] = 0.7 * Math.cos(2 * Math.PI * 5000 * time_intervals[i]);
-        }
-
-        debugger;
-
-        data = cos_wave;
-        
         window.fftw.then(fftwJS => {
-            const size = data.length;
-            var fftr = new fftwJS.r2c.fft1d(size);
-            var transform = fftr.forward(data);
-            var transScaled = scaleTransform(transform, size);
-            debugger;
+            document.getElementById("my-form").addEventListener("submit", function (e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                const data = formData
+                    .get("data")
+                    .replaceAll("\n", ",")
+                    .split(",")
+                    .filter(a => !!a);
+
+                const terminal = document.getElementById("fft-output");
+                terminal.innerHTML = "";
+
+                new Promise(res => {
+                    setTimeout(() => {
+                        res(fft(fftwJS, data));
+                    }, 500);
+                }).then(fftOutput => {
+                    const output = Array
+                        .from({ length: (fftOutput.length / 2) }, (_, i) => {
+                            const complexNumberIndex = i * 2;
+                            const realPart = fftOutput[complexNumberIndex];
+                            const imaginaryPart = fftOutput[complexNumberIndex + 1];
+                            const beatifyNegative = value => {
+                                const str = `${imaginaryPart}`;
+                                if (str.startsWith('-')) {
+                                    return `- ${str.slice(1)}`;
+                                } else {
+                                    return str;
+                                }
+                            }
+                            return `${realPart} ${imaginaryPart >= 0 ? `+ ${imaginaryPart}` :  beatifyNegative(imaginaryPart) }j`;
+                    });
+
+                    output.forEach(line => {
+                        const p = document.createElement("p");
+                        p.innerText = line;
+                        terminal.appendChild(p);
+                    });
+                });
+            });
+
+            // const size = data.length;
+            // var fftr = new fftwJS.r2c.fft1d(size);
+            // var transform = fftr.forward(data);
+            // var transScaled = scaleTransform(transform, size);
+            // debugger;
             // var a2_again = fftr.inverse(transScaled);
             // for(var i = 0; i < size; i++) {
             //     console.log(data[i], a2_again[i]);
             // }
             // // Clean up after you're done - NOTE:: dispose will modify the transform array slightly,
             // // so only dispose after any use of results are complete
-            // fftr.dispose();
-        })
-    })
+            // 
+        });
 
-         
+
+
     </script>
-     <script type="module">
-        import { default as fftw } from "./fftw-js.0.1.4.esm.min.js";
-        debugger;
-    </script>
-    <!--
-        <script type="module">
-        // Create a sine wave signal
-        const sampleRate = 512; // Sample rate in Hz
-        const frequency = 5; // Frequency of the sine wave in Hz
-        const duration = 1; // Duration in seconds
-        const numSamples = sampleRate * duration;
-        const sineWave = new Float32Array(numSamples);
 
-        for (let i = 0; i < numSamples; i++) {
-            sineWave[i] = Math.sin(2 * Math.PI * frequency * (i / sampleRate));
-        }
-
-        // Perform FFT using fftw-js
-        const fft = new fftw.FFT(numSamples);
-        const inBuffer = fft.allocComplex();
-        const outBuffer = fft.allocComplex();
-
-        // Copy the sine wave data into the input buffer
-        for (let i = 0; i < numSamples; i++) {
-            inBuffer[i][0] = sineWave[i]; // Real part
-            inBuffer[i][1] = 0;            // Imaginary part
-        }
-
-        // Execute the FFT
-        fft.execute(inBuffer, outBuffer);
-
-        // Output the FFT results
-        const frequencies = new Float32Array(numSamples);
-        for (let i = 0; i < numSamples; i++) {
-            frequencies[i] = Math.sqrt(outBuffer[i][0] ** 2 + outBuffer[i][1] ** 2);
-        }
-
-        // Log the results
-        console.log(frequencies);
-    </script> -->
+    <form id="my-form">
+        <label for="data">Tell us your story:</label>
+        <textarea id="data" name="data" rows="5" placeholder="Enter 1,2,2,0 gives ['5 + 0j', '-1 - 2j', '1 + 0j']"></textarea>
+        <br>
+        <input type="submit" value="calculate">
+    </form>
+    <br>
+    <div id="fft-output" class="terminal">
+    </div>
 </body>
+
 </html>
