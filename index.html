@@ -44,7 +44,10 @@
 
 <body>
     <script src='./fftw-js/bundle.js'></script>
-    <script>
+    <script type="module">
+        import { ComplexNumber } from "https://dirkarnez.github.io/complex-number-calculator/esm/complex-number.js";
+        
+        const myForm = document.getElementById("my-form");
         const fft = (fftwJS, array) => {
             var fftr = new fftwJS.r2c.fft1d(array.length);
             const fftOutput = fftr.forward(array);
@@ -53,10 +56,11 @@
         }
 
         window.fftw.then(fftwJS => {
-            document.getElementById("my-form").addEventListener("submit", function (e) {
+            myForm.addEventListener("submit", function (e) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
 
+                const samplingFrequency = Number(formData.get("sampling-frequency"));
                 const data = formData
                     .get("data")
                     .replaceAll("\n", ",")
@@ -71,25 +75,42 @@
                         res(fft(fftwJS, data));
                     }, 500);
                 }).then(fftOutput => {
+                    const beatify = (realPart, imaginaryPart) => {
+                        const imaginaryPartString = `${imaginaryPart}`;
+                        return `${realPart} ${imaginaryPart >= 0 ? `+ ${imaginaryPart}` :  imaginaryPartString.startsWith('-') ?  `- ${imaginaryPartString.slice(1)}` : imaginaryPartString}j`;
+                    }
+
                     const output = Array
-                        .from({ length: (fftOutput.length / 2) }, (_, i) => {
-                            const complexNumberIndex = i * 2;
-                            const realPart = fftOutput[complexNumberIndex];
-                            const imaginaryPart = fftOutput[complexNumberIndex + 1];
-                            const beatifyNegative = value => {
-                                const str = `${imaginaryPart}`;
-                                if (str.startsWith('-')) {
-                                    return `- ${str.slice(1)}`;
-                                } else {
-                                    return str;
-                                }
-                            }
-                            return `${realPart} ${imaginaryPart >= 0 ? `+ ${imaginaryPart}` :  beatifyNegative(imaginaryPart) }j`;
+                        .from({ length: (fftOutput.length / 2) }, (_, k) => {
+                            const complexNumberIndex = k * 2;
+                            const realPart = Number(fftOutput[complexNumberIndex]).toFixed(3);
+                            const imaginaryPart = Number(fftOutput[complexNumberIndex + 1]).toFixed(3);
+
+                            const complexNumber = new ComplexNumber();
+                            complexNumber.setRectangularForm(realPart, imaginaryPart);
+
+
+                            const sampleRate = samplingFrequency;
+                            const amplitude = complexNumber.multiplyWithScalar(2).amplitude() / sampleRate;
+                            const hz = k * (sampleRate / data.length);
+                            return { k, amplitude, hz, complexNumber };
+                        
+                            /*
+                                Scaling Factor: The DFT outputs include a scaling factor based on the number of samples. 
+                                If you want to obtain the true amplitude of the frequency components, 
+                                you need to scale the result appropriately. For an N-point DFT, the magnitudes are typically scaled by 1/N.
+                            */
+                            // for amplitude, see [Discrete Fourier Transform - Simple Step by Step - YouTube](https://www.youtube.com/watch?v=mkGsMWi_j4Q)
+                            // return `${beatify(realPart, imaginaryPart)}, amplitude = ${Number(complexNumber.amplitude() * 2 * ( 1.0 / data.length)).toFixed(3)}, phase (degree) = ${complexNumber.phaseInDegree()}°`;
                     });
 
-                    output.forEach(line => {
+                    output
+                    .filter(({ amplitude, hz, k, complexNumber }) => {
+                        return Number(amplitude).toFixed(2) > 0;
+                    })
+                    .forEach(({ amplitude, hz, k, complexNumber }) => {
                         const p = document.createElement("p");
-                        p.innerText = line;
+                        p.innerText = `k = ${k}, freq = ${hz.toFixed(3)}Hz, true amplitude(aka scaled) = ${amplitude.toFixed(3)}, Rectangular Form: ${complexNumber.toString()}, Polar Form: ${complexNumber.convertToPolarForm()}`;;
                         terminal.appendChild(p);
                     });
                 });
@@ -109,13 +130,19 @@
             // 
         });
 
-
-
+        document.getElementById("try1HzInAmplitude1SamplingFrequency8").addEventListener("click", function () {
+            document.getElementById("data").value = `0, 0.707, 1, 0.707,  0, -0.707, -1, -0.707`;
+            document.getElementById("sampling-frequency").value = 8;
+        });
     </script>
 
     <form id="my-form">
-        <label for="data">Tell us your story:</label>
+        <label for="data">Discrete data:</label>
         <textarea id="data" name="data" rows="5" placeholder="Enter 1,2,2,0 gives ['5 + 0j', '-1 - 2j', '1 + 0j']"></textarea>
+        <label for="sampling-frequency">Sampling Frequency (10us = 100000hz, optional for DFT):</label>
+        <input type="number" id="sampling-frequency" name="sampling-frequency"></input>
+        <br>
+        <button type="button" id="try1HzInAmplitude1SamplingFrequency8">Try 1Hz (Amplitude: 1 Unit, SamplingFrequency: 8Hz)</button>
         <br>
         <input type="submit" value="calculate">
     </form>

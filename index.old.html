@@ -27,14 +27,11 @@
             return result
         }
     
-    var scaleTransform = function(trans, size) {
-        var i = 0,
-            bSi = 1.0 / size,
-            x = trans;
-        while(i < x.length) {
-            x[i] *= bSi; i++;
+    var scaleTransform = function(trans, size) {  
+        for(var i = 0; i < trans.length; i++) {
+            trans[i] *= ( 1.0 / size); 
         }
-        return x;
+        return trans;
     };
 
     function reorganizeNumpyRealOutput (a) {
