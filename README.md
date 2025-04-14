@@ -8,7 +8,7 @@
 AC signal
 Vin a 0 dc 0 ac 1 sin(0 5 3)
 R1 a b 10k
-C1 b 0 1u
+C1 b 0 10u
 .tran 10u 1
 *.ac dec 10 10 1000
 .end
