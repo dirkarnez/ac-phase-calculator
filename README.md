@@ -4,6 +4,10 @@
 
 ![](./394358342-a2bef090-25ae-47ed-b524-299a000086f6.png)
 
+### Notes
+- > A complex number that is used to represent a sinusoidal voltage or current is called a phasor
+      - [Complex Numbers, Phasors And Phase Shift | Analysis of AC Systems | Power Electronics Textbook](https://eepower.com/power-electronics-textbook/vol-i-electrical-power-systems-design/chapter-2-analysis-ac-systems/complex-numbers-phasors-and-phase-shift/)
+
 ### Working spice
 ```
 AC signal
